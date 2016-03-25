@@ -8,8 +8,8 @@ Este repositorio cuenta con 2 proyectos los cuales son el cliente y el servidor,
 
 ## Procedimiento para realizar la prueba
 * Importar al eclipse los 3 proyectos.
-* Instalar la [Commons Library](https://github.com/sisoputnfrba/so-commons-library) y configurarla en los 3 proyectos.
-* Configurar en los 3 proyectos la librería pthread. ([Video paso a paso youtube](https://www.youtube.com/watch?v=s5ac8CPDkMg))
+* Instalar la [Commons Library](https://github.com/sisoputnfrba/so-commons-library) y configurarla en los 3 proyectos. ([Video paso a paso youtube](https://www.youtube.com/watch?v=s5ac8CPDkMg))
+* Configurar en los 3 proyectos la librería pthread.
 * Compilar la shared library (entrar en socket.c o útil.c y compilar), el cliente y el servidor.
 * Finalmente se ejecutar una instancia de servidor y una o varias instancias de clientes.
 
