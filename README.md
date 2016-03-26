@@ -6,6 +6,13 @@ Para comprender el funcionamiento de la librería y cómo funcionan los sockets 
 
 Este repositorio cuenta con 2 proyectos los cuales son el cliente y el servidor, y con un proyecto shared library "Includes", donde se encuentra la libreria de socket.c la cual implementan tanto el cliente como el servidor. Además hay una librería util.c, la cual contiene un ejemplo de cómo realizar serialización y un método para implementar sincronización bastante simple.
 
+## Lógica de funcionamiento
+El funcionamiento es algo similar a la [arquitectura SOA](https://es.wikipedia.org/wiki/Arquitectura_orientada_a_servicios), en donde tanto el servidor y cliente van a tener declaradas funciones, las cuales podrán ser llamadas por los procesos que estén conectados. Es decir, el cliente va a poder llamar a las funciones del servidor y el servidor va a poder llamar a las funciones del cliente. Claramente estas funciones no tienen un return, para eso la misma función si tiene que devolverle un resultado al proceso que lo llamo, tiene que hacer llamado a una función con el mismo procedimiento. (En la arquitectura SOA, solo el cliente "consume" del servidor "servicios" (no al revés) y estos si tienen un return; sería interesante modificar la librería para que permita un "return", en algún futuro con tiempo lo voy a desarrollar).
+
+En el ejemplo de este proyecto, se inicializa un proceso servidor, el cual se pone a la escucha definiendo una única función client_saludar() (la cual podrá ser llamada por los clientes que se conecten). Luego se inicializan los clientes, los cuales se conectan al proceso anteriormente inicializado definiendo una función server_saludar() (la cual podrá ser llamada por el servidor). Una vez que un cliente se conecta llama a la función client_saludar del servidor, la cual recibe 3 parámetros. El servidor al recibir esto lo imprime por pantalla y a continuación llama a la función server_saludar del cliente que recibe 2 parámetros. El cliente imprime lo que le envía el servidor, y vuelve a llamar a la función saludar del servidor. Esto provoca un bucle infinito de saludos mutuos.
+
+Para comprender 100% a utilizar esta librería recomiendo modificar este ejemplo haciendo un chat.
+
 ## Procedimiento para realizar la prueba
 * Importar al eclipse los 3 proyectos.
 * Instalar la [Commons Library](https://github.com/sisoputnfrba/so-commons-library) y configurarla en los 3 proyectos.
@@ -38,12 +45,12 @@ Para que un proceso ejecute el proceso de otro proceso se utiliza la función:<b
 
 Para finalizar la conexión con otro proceso:<br />
 `close(socket);`<br />
-**socket_server** = Numero de socket destinado al proceso que se quiere finalizar
+**socket** = Numero de socket destinado al proceso que se quiere finalizar
 
-## Lógica de funcionamiento
-El funcionamiento es algo similar a la [arquitectura SOA](https://es.wikipedia.org/wiki/Arquitectura_orientada_a_servicios), en donde tanto el servidor y cliente van a tener declaradas funciones, las cuales podrán ser llamadas por los procesos que estén conectados. Es decir, el cliente va a poder llamar a las funciones del servidor y el servidor va a poder llamar a las funciones del cliente. Claramente estas funciones no tienen un return, para eso la misma función si tiene que devolverle un resultado al proceso que lo llamo, tiene que hacer llamado a una función con el mismo procedimiento.
+## Estructura 'fns'
+desarrollar...
 
-## Estructura data
+## Estructura 'data'
 La estructura data es simplemente para mantener a mano una estructura de datos por cada conexión. Veamos un ejemplo. El servidor lo que hace es sumar y multiplicar números que el cliente le va dando. Es decir que por cada cliente se tiene que tener 2 contadores uno para las sumas y otra para las multiplicaciones. Entonces la estructura tendría estos dos contadores y cada vez que un cliente llama a la función “tomaElNumerito” del servidor, dicha función ya tiene a mano la estructura del cliente para hacer:<br />
 `data->contadorSuma = data->contadorSuma + Numero;`<br />
 `data->contadorMult = data->contadorMult * Numero;`<br />
