@@ -48,7 +48,45 @@ Para finalizar la conexión con otro proceso:<br />
 **socket** = Numero de socket destinado al proceso que se quiere finalizar
 
 ## Estructura 'fns'
-desarrollar...
+Tanto las funciones `createListen()` como `connectServer()` necesitan recibir una lista de todas las funciones que podrán ser llamadas desde otros procesos con la función `runFunction()`. Esta lista esta echa con la estructura “t_dictionary” de la Commons library.
+
+Se debe inicializar de la siguiente manera:<br />
+`t_dictionary * fns;`<br />
+`fns = dictionary_create();`
+
+Luego se agrega todas las funciones que necesitemos de la siguiente manera:<br />
+`dictionary_put(fns, "miFuncion1", &miFuncion1);`<br />
+`dictionary_put(fns, "miFuncion2", &miFuncion2);`<br />
+.<br />
+.<br />
+`dictionary_put(fns, "miFuncion2", &miFuncionN);`
+
+El &nombreDeUnaFuncion lo que hace es traer el puntero a la referencia de la función, gracias a esto la librería socket internamente va poder llamarla cuando sea necesario.
+
+Las funciones “miFuncionN” son funciones que tienen que estar desarrolladas dentro del proyecto, las cuales reciben de forma obligatoria 2 parámetros:
+* socket_connection * connection
+* char ** args
+
+La estructura connection contiene los siguientes campos:<br />
+**int socket** = Número de socket asignado por el sistema operativo a la conexión con el proceso que llamo a esta función. 
+**char * ip** = IP del proceso que llamo a esta función.<br />
+**int port** = Puerto del proceso que llamo a esta función.<br />
+**void * data** = Estructura de datos que se mantiene durante toda la sesión de conexión con el proceso que llamo a esta función.<br />
+**bool run_fn_connectionClosed** = Determina si al finalizar la conexión con el proceso que lo llamo se tiene que llamar a la función connectionClosed (ya explicada) en caso de que exista.
+
+La estructura args contiene un array de strings los cuales serían los “parametros” de esta función, que fueron trazados en el proceso que llamo a esta función a través de la función `runFunction()`.
+
+Veamos un ejemplo: el proceso A ejecuta la siguiente instrucción:<br />
+`runFunction(numero_socket_procesoB, "procesoB_saludar", 3, "hola", "como", "estas");`
+
+A continuación en el proceso B se produce una invocación a la función `procesoB_saludar()`, el array args[] contendrá la siguiente información:<br />
+args[0] = “hola”<br />
+args[1] = “como”<br />
+args[2] = “estas”<br />
+
+¿Se puede enviar otra cosa que no sean strings? La respuesta es **NO**, para eso uno tiene que parsear el string de acuerdo a la necesidad que tengamos. Si el parámetro args[0] tendría que recibir un entero, por ejemplo el número 4, en realidad recibiría un “4” como string y habría que convertirlo a entero a través del método `atoi()` y desde el lado del proceso que lo llamo a la función habría que pasar de entero a string antes de pasar el dato a la función `runFunction()` con el método `string_itoa()` de la commons library (recordar que luego hay que realizar un free).
+
+¿Cómo enviar un array? Para esto hay que [serializar]( https://es.wikipedia.org/wiki/Serializaci%C3%B3n) el array que se quiere enviar y luego en el proceso que lo recibe deserializarlo.
 
 ## Estructura 'data'
 La estructura data es simplemente para mantener a mano una estructura de datos por cada conexión. Veamos un ejemplo. El servidor lo que hace es sumar y multiplicar números que el cliente le va dando. Es decir que por cada cliente se tiene que tener 2 contadores uno para las sumas y otra para las multiplicaciones. Entonces la estructura tendría estos dos contadores y cada vez que un cliente llama a la función “tomaElNumerito” del servidor, dicha función ya tiene a mano la estructura del cliente para hacer:<br />
