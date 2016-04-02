@@ -24,12 +24,12 @@ Para comprender 100% a utilizar esta librería recomiendo modificar este ejemplo
 ## Funciones
 El proceso que se quiera poner a la escucha utiliza la función:<br />
 `createListen(portServer, &newClient, fns, &client_connectionClosed, data);` <br />
-**portServer** = puerto en el que se pone a la escucha<br />
-**newClient** = referencia a función que se quiere que se llame cuando se conecta un proceso<br />
-**fns** = referencias de funciones del proceso que los otros procesos conectados van a poder llamar<br />
-**client_connectionClosed** = referencia a función que se quiere que se llame cuando se desconecta un proceso<br />
-**data** = estructura de datos que se quiere mantener compartida entre las funciones del proceso
-> Devuelve 1 en caso de exito, caso contrario devuelve -1
+**portServer** = puerto en el que se pone a la escucha.<br />
+**newClient** = referencia a función que se quiere que se llame cuando se conecta un proceso. (puede ingresarse NULL para que no se llame ninguna función).<br />
+**fns** = referencias de funciones del proceso que los otros procesos conectados van a poder llamar.<br />
+**client_connectionClosed** = referencia a función que se quiere que se llame cuando se desconecta un proceso. (puede ingresarse NULL para que no se llame ninguna función).<br />
+**data** = estructura de datos que se quiere mantener compartida entre las funciones del proceso.
+> Devuelve 1 en caso de éxito, caso contrario devuelve -1.
 
 El proceso que se quiere conectar al que está en escucha utiliza:<br />
 `connectServer(ip, port, fns, &server_connectionClosed, data);`<br />
@@ -41,9 +41,12 @@ El proceso que se quiere conectar al que está en escucha utiliza:<br />
 > Devuelve el número de socket de la conexión.
 
 Para que un proceso ejecute el proceso de otro proceso se utiliza la función:<br />
-`runFunction(socket_server, "client_saludar", 3, "hola", "como", "estas");`<br />
-**socket_server** = Numero de socket del proceso al que se le quiere correr la función en este ejemplo se le llama a la función “client_saludar” y se le envía 3 parametros.
-> Devuelve true en caso de exito, caso contrario devuelve falsee
+`runFunction(socket_server, nombre_funcion, N, arg1, arg2, arg3, ..., argN);`<br />
+**socket_server** = Numero de socket del proceso al que se le quiere correr la función.<br />
+**nombre_funcion** = nombre de la función que se quiere llamar. (este string deberá coincidir con el string declarado en el diccionario de funciones del proceso receptor).<br />
+**N** = Número de argumentos que se envian a la funcion a llamar.<br />
+**argN** = Argumentos que se envian a la funcion a llamar.<br />
+> Devuelve true en caso de éxito, caso contrario devuelve false.
 
 Para finalizar la conexión con otro proceso:<br />
 `close(socket);`<br />
